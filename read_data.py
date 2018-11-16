@@ -2,8 +2,6 @@ import pandas as pd
 import numpy as np
 
 def get_time_dict():
-	# doc
-	# 2
     rng = pd.date_range('2013-10-27', '2014-08-01')
     print('number of dates:', len(rng))
     time_dict = pd.Series(np.arange(len(rng)), index=rng)
