@@ -1,0 +1,5 @@
+data/test
+data/train
+data/*.csv
+
+**/.DS_Store
