@@ -2,5 +2,6 @@ data/test
 data/train
 data/*.csv
 data/*.ipynb
+.ipynb_checkpoints
 
 **/.DS_Store
