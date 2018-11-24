@@ -17,10 +17,6 @@ class Preprocessor():
         self.enroll = Enrollment(enroll_path)
         self.truth = Truth(truth_path)
 
-    def get_truth(self):
-        return self.truth
-    
-    def get_merge_df(self):
         enroll_df = self.enroll.get_data()
         log_df = self.log.get_data()
 
@@ -31,16 +27,50 @@ class Preprocessor():
         enroll_course_df = enroll_df.merge(course_date_df, on='course_id', how='inner')
         log_enroll_course_df = log_df.merge(enroll_course_df, on = 'enrollment_id', how='inner')
 
-        return log_enroll_course_df
+        self.merge_df = log_enroll_course_df
+
+    def get_truth(self):
+        return self.truth
+
+    def session_count(self):
+        start_time = time.time()
+
+        merge_df = self.merge_df.filter(items=['enrollment_id', 'time', 'event'])
+        merge_df = merge_df.assign(time_span = merge_df['time'].values.astype('datetime64[h]') - merge_df['time'].shift(1).values.astype('datetime64[h]'))
+        session_series = merge_df.groupby(['enrollment_id']).apply(lambda x: (x['time_span'] != np.timedelta64(0,'ns')).sum())
+        session_count_df = session_series.to_frame().reset_index().rename(columns={0:'session_count'})
+
+        print("session_count features extracted! %f seconds taken" % (time.time()-start_time))
+        print("Shape of the session_count dataframe: ", session_count_df.shape)
+
+        return session_count_df
+
+    def weekly_session_count(self):
+        start_time = time.time()
+
+        merge_df = self.merge_df.filter(items=['enrollment_id', 'time', 'event', 'start'])
+        merge_df= merge_df.assign(week_index = merge_df['time'].values.astype('datetime64[W]') - merge_df['start'].values.astype('datetime64[W]'))
+        merge_df = merge_df.assign(time_span = merge_df['time'].values.astype('datetime64[h]') - merge_df['time'].shift(1).values.astype('datetime64[h]'))
+        weekly_session_count = merge_df.groupby(['enrollment_id', 'week_index']).apply(lambda x: (x['time_span'] != np.timedelta64(0,'ns')).sum())
+        weekly_session_count_df = weekly_session_count.to_frame()
+        weekly_session_count_df = weekly_session_count_df.unstack(fill_value=0).sum(level=1,axis=1)
+        weekly_session_count_df = weekly_session_count_df.add_suffix("_count").rename(columns={'0 days 00:00:00_count': 'week_one_session', '7 days 00:00:00_count': 'week_two_session', 
+        '14 days 00:00:00_count': 'week_three_session', '21 days 00:00:00_count': 'week_four_session', '28 days 00:00:00_count': 'week_five_session', '35 days 00:00:00_count': 'week_six_session'})
+
+        print("weekly_session_count features extracted! %f seconds taken" % (time.time()-start_time))
+        print("Shape of the weekly_session_count dataframe: ", weekly_session_count_df.shape)
+
+        return weekly_session_count_df
+
 
     def weekly_event_count(self):
         start_time = time.time()
 
-        merge_df = self.get_merge_df().filter(items=['enrollment_id', 'time', 'event', 'start'])
+        merge_df = self.merge_df.filter(items=['enrollment_id', 'time', 'event', 'start'])
         merge_df= merge_df.assign(week_index = merge_df['time'].values.astype('datetime64[W]') - merge_df['start'].values.astype('datetime64[W]'))
         weekly_event_count = merge_df.groupby(['enrollment_id','week_index']).event.count().unstack(fill_value=0)
-        weekly_event_count = weekly_event_count.add_suffix("_count").rename(columns={'0 days 00:00:00_count': 'week_one_count', '7 days 00:00:00_count': 'week_two_count', 
-        '14 days 00:00:00_count': 'week_three_count', '21 days 00:00:00_count': 'week_four_count', '28 days 00:00:00_count': 'week_five_count', '35 days 00:00:00_count': 'week_six_count'})
+        weekly_event_count = weekly_event_count.add_suffix("_count").rename(columns={'0 days 00:00:00_count': 'week_one_event', '7 days 00:00:00_count': 'week_two_event', 
+        '14 days 00:00:00_count': 'week_three_event', '21 days 00:00:00_count': 'week_four_event', '28 days 00:00:00_count': 'week_five_event', '35 days 00:00:00_count': 'week_six_event'})
         weekly_event_count.reset_index(inplace=True)
 
         print("weekly_event_count features extracted! %f seconds taken" % (time.time()-start_time))
@@ -61,10 +91,18 @@ class Preprocessor():
         return event_count_df
     
     def get_features_all(self):
+        start_time = time.time()
+
         event_count_df = self.event_count()
-        # weekly_event_count = self.weekly_event_count()
-        # features_df = pd.merge(event_count_df, weekly_event_count, how='inner', on='enrollment_id')
-        return event_count_df
+        weekly_event_count = self.weekly_event_count()
+        session_count_df = self.weekly_session_count()
+        event_weekly_count_df = pd.merge(event_count_df, weekly_event_count, how='inner', on='enrollment_id')
+        features_df = pd.merge(event_weekly_count_df, session_count_df, how='inner', on='enrollment_id')
+
+        print("All features extracted! %f seconds taken" % (time.time()-start_time))
+        print("Shape of the whole features dataframe: ", features_df.shape)
+
+        return features_df
     
     def get_values_all(self):
         features_df = self.get_features_all()
