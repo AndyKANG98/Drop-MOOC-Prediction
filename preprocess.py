@@ -128,15 +128,53 @@ class Preprocessor():
         session_count_df = self.weekly_session_count()
         event_weekly_count_df = pd.merge(event_count_df, weekly_event_count, how='inner', on='enrollment_id')
         features_df = pd.merge(event_weekly_count_df, session_count_df, how='inner', on='enrollment_id')
-
+        
+        df_all = features_df.merge(self.truth.get_data(), left_on='enrollment_id', right_on='enrollment_id', how='inner')
+        
         print("All features extracted! %f seconds taken" % (time.time()-start_time))
         print("Shape of the whole features dataframe: ", features_df.shape)
 
-        return features_df
+        return df_all
+    
+    def data_preprocessing(self):
+        df = self.get_features_all()
+        num_feature = list(df.columns[1:-1])
+
+        for item in num_feature:
+            Q3 = df[item].quantile(0.75)
+            Q1 = df[item].quantile(0.25)
+            IQR = Q3-Q1
+            upper = Q3+1.5*IQR
+            lower = Q1-1.5*IQR
+            for i in range (0,72395):
+                if df[item][i] < lower:
+                    df[item][i] = lower
+                if df[item][i] > upper:
+                    df[item][i] = upper
+
+        for value in num_feature:
+            freq_set = df[value].value_counts()
+            max_1 = freq_set.max()
+            max_2 = 0
+            for num in freq_set:
+                if num == max_1:
+                    continue
+                max_2 = num
+                break
+            ratio = max_2/float(max_1)
+            if ratio < 0.05:
+                df = df.drop(value,1)      
+
+        num_feature = list(df.columns[1:-1])
+        for item in num_feature:
+            df[item]=(df[item]-df[item].min())/(df[item].max()-df[item].min())
+
+        print("Getting data preprocessing done!")
+        return df
     
     def get_values_all(self):
-        features_df = self.get_features_all()
-        df_all = features_df.merge(self.truth.get_data(), left_on='enrollment_id', right_on='enrollment_id', how='inner')
+        df_all = self.data_preprocessing()
+        
         df_all_shuffled = df_all.sample(frac=1)
         
         X = df_all_shuffled.drop(columns=['label', 'enrollment_id']).values
@@ -147,7 +185,7 @@ class Preprocessor():
         return X, y
 
     def get_values_partial(self, ratio):
-        features_df = self.get_features_all()
+        features_df = self.data_preprocessing()
         df_all = features_df.merge(self.truth.get_data(), left_on='enrollment_id', right_on='enrollment_id', how='inner')
         df_1 = df_all[(df_all['label']==1)].sample(frac=ratio)
         df_partial = pd.concat([df_1, df_all[(df_all['label']==0)]])
