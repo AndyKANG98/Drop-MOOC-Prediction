@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np 
+from scipy.special import boxcox1p
 import time
 from datetime import datetime
 from load_data import Course_Date
@@ -134,16 +135,7 @@ class Preprocessor():
         start_time = time.time()
 
         df = self.get_features_all()
-        num_feature = list(df.columns[1:-1])
-
-        for item in num_feature:
-            Q3 = df[item].quantile(0.75)
-            Q1 = df[item].quantile(0.25)
-            IQR = Q3-Q1
-            upper = Q3+1.5*IQR
-            lower = Q1-1.5*IQR
-            df.loc[df[item] > upper, item] = upper
-            df.loc[df[item] < lower, item] = lower
+'''        num_feature = list(df.columns[1:-1])
 
         for value in num_feature:
             freq_set = df[value].value_counts()
@@ -157,10 +149,10 @@ class Preprocessor():
             ratio = max_2/float(max_1)
             if ratio < 0.05:
                 df = df.drop(value,1)      
-
+'''
         num_feature = list(df.columns[1:-1])
         for item in num_feature:
-            df[item]=(df[item]-df[item].min())/(df[item].max()-df[item].min())
+            df[item]= boxcox1p(df[item], 0.25)
 
         print("Getting train data preprocessing done! %f seconds taken" % (time.time()-start_time))
         return df
@@ -169,24 +161,16 @@ class Preprocessor():
         start_time = time.time()
 
         df = self.get_features_all()
-        num_feature = list(df.columns[1:-1])
+        '''num_feature = list(df.columns[1:-1])
 
-        for item in num_feature:
-            Q3 = df[item].quantile(0.75)
-            Q1 = df[item].quantile(0.25)
-            IQR = Q3-Q1
-            upper = Q3+1.5*IQR
-            lower = Q1-1.5*IQR
-            df.loc[df[item] > upper, item] = upper
-            df.loc[df[item] < lower, item] = lower
-        
-        df = df.drop('week_one_session',1)
-        df = df.drop('week_five_session',1)
+      
+        df = df.drop('problem_count',1)
         df = df.drop('week_six_session',1)
-
+        df = df.drop('problem_ratio',1)
+'''
         num_feature = list(df.columns[1:-1])
         for item in num_feature:
-            df[item]=(df[item]-df[item].min())/(df[item].max()-df[item].min())
+            df[item]= boxcox1p(df[item], 0.25)
 
         print("Getting test data preprocessing done! %f seconds taken" % (time.time()-start_time))
         return df
