@@ -10,20 +10,13 @@ from load_data import Truth
 
 
 class Preprocessor():
-    def __init__(self, log_path, enroll_path, truth_path):
+    def __init__(self, data_type):
+        self.data_type = data_type
         self.course_date = Course_Date('data/date.csv')
         self.course_obj = Course_Object('data/object.csv')
-        self.log = Log(log_path)
-        self.enroll = Enrollment(enroll_path)
-        self.truth = Truth(truth_path)
-
-        # course_date_df = pd.DataFrame.from_dict(self.course_date.get_course_info()).T
-        # course_date_df.reset_index(inplace = True)
-        # course_date_df.rename(columns={"index": "course_id"}, inplace = True)
-
-        # course_df = self.course_date.get_data().merge(self.course_obj.get_data(), on='course_id', how='inner')
-        # enroll_course_df = self.enroll.get_data().merge(course_df, on='course_id', how='inner')
-        # self.merge_df = self.log.get_data().merge(enroll_course_df, on = 'enrollment_id', how='inner')
+        self.log = Log('data/%s/log_%s.csv' % (data_type, data_type))
+        self.enroll = Enrollment('data/%s/enrollment_%s.csv' % (data_type, data_type))
+        self.truth = Truth('data/%s/truth_%s.csv' % (data_type, data_type))
 
     def get_truth(self):
         return self.truth
@@ -124,10 +117,11 @@ class Preprocessor():
         start_time = time.time()
 
         event_count_df = self.event_count()
-        weekly_event_count = self.weekly_event_count()
+        # weekly_event_count = self.weekly_event_count()
         session_count_df = self.weekly_session_count()
-        event_weekly_count_df = pd.merge(event_count_df, weekly_event_count, how='inner', on='enrollment_id')
-        features_df = pd.merge(event_weekly_count_df, session_count_df, how='inner', on='enrollment_id')
+        problem_video_df = self.problem_video_ratio()
+        event_session_count_df = pd.merge(event_count_df, session_count_df, how='inner', on='enrollment_id')
+        features_df = pd.merge(event_session_count_df, problem_video_df, how='inner', on='enrollment_id')
         
         df_all = features_df.merge(self.truth.get_data(), left_on='enrollment_id', right_on='enrollment_id', how='inner')
         
@@ -137,42 +131,46 @@ class Preprocessor():
         return df_all
     
     def data_preprocessing(self):
+        start_time = time.time()
+
         df = self.get_features_all()
-        num_feature = list(df.columns[1:-1])
+        # num_feature = list(df.columns[1:-1])
 
-        for item in num_feature:
-            Q3 = df[item].quantile(0.75)
-            Q1 = df[item].quantile(0.25)
-            IQR = Q3-Q1
-            upper = Q3+1.5*IQR
-            lower = Q1-1.5*IQR
-            for i in range (0,72395):
-                if df[item][i] < lower:
-                    df[item][i] = lower
-                if df[item][i] > upper:
-                    df[item][i] = upper
+        # for item in num_feature:
+        #     Q3 = df[item].quantile(0.75)
+        #     Q1 = df[item].quantile(0.25)
+        #     IQR = Q3-Q1
+        #     upper = Q3+1.5*IQR
+        #     lower = Q1-1.5*IQR
+        #     for i in range (len(df)):
+        #         if df[item][i] < lower:
+        #             df[item][i] = lower
+        #         if df[item][i] > upper:
+        #             df[item][i] = upper
 
-        for value in num_feature:
-            freq_set = df[value].value_counts()
-            max_1 = freq_set.max()
-            max_2 = 0
-            for num in freq_set:
-                if num == max_1:
-                    continue
-                max_2 = num
-                break
-            ratio = max_2/float(max_1)
-            if ratio < 0.05:
-                df = df.drop(value,1)      
+        # for value in num_feature:
+        #     freq_set = df[value].value_counts()
+        #     max_1 = freq_set.max()
+        #     max_2 = 0
+        #     for num in freq_set:
+        #         if num == max_1:
+        #             continue
+        #         max_2 = num
+        #         break
+        #     ratio = max_2/float(max_1)
+        #     if ratio < 0.05:
+        #         df = df.drop(value,1)      
 
-        num_feature = list(df.columns[1:-1])
-        for item in num_feature:
-            df[item]=(df[item]-df[item].min())/(df[item].max()-df[item].min())
+        # num_feature = list(df.columns[1:-1])
+        # for item in num_feature:
+        #     df[item]=(df[item]-df[item].min())/(df[item].max()-df[item].min())
 
-        print("Getting data preprocessing done!")
+        print("Getting data preprocessing done! %f seconds taken" % (time.time()-start_time))
         return df
     
     def get_values_all(self):
+        # if self.data_type = 'train', do train_preprocessing()
+        # if self.data_type = 'test', do test_preprocessing()
         df_all = self.data_preprocessing()
         
         df_all_shuffled = df_all.sample(frac=1)
