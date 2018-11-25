@@ -17,25 +17,51 @@ class Preprocessor():
         self.enroll = Enrollment(enroll_path)
         self.truth = Truth(truth_path)
 
-        enroll_df = self.enroll.get_data()
-        log_df = self.log.get_data()
+        # course_date_df = pd.DataFrame.from_dict(self.course_date.get_course_info()).T
+        # course_date_df.reset_index(inplace = True)
+        # course_date_df.rename(columns={"index": "course_id"}, inplace = True)
 
-        course_date_df = pd.DataFrame.from_dict(self.course_date.get_course_info()).T
-        course_date_df.reset_index(inplace = True)
-        course_date_df.rename(columns={"index": "course_id"}, inplace = True)
-
-        enroll_course_df = enroll_df.merge(course_date_df, on='course_id', how='inner')
-        log_enroll_course_df = log_df.merge(enroll_course_df, on = 'enrollment_id', how='inner')
-
-        self.merge_df = log_enroll_course_df
+        # course_df = self.course_date.get_data().merge(self.course_obj.get_data(), on='course_id', how='inner')
+        # enroll_course_df = self.enroll.get_data().merge(course_df, on='course_id', how='inner')
+        # self.merge_df = self.log.get_data().merge(enroll_course_df, on = 'enrollment_id', how='inner')
 
     def get_truth(self):
         return self.truth
 
-    def session_count(self):
+    def problem_video_ratio(self):
         start_time = time.time()
 
-        merge_df = self.merge_df.filter(items=['enrollment_id', 'time', 'event'])
+        course_obj = self.course_obj.get_data()
+        log = self.log.get_data()
+        course_category = course_obj.groupby('course_id').category.value_counts().unstack(fill_value=0)
+        course_category = course_category.filter(items=['problem', 'video'])
+        course_category.reset_index(inplace=True)
+        
+        course_obj = course_category.merge(course_obj, on='course_id', how='inner')
+        log_course_df = log.merge(course_obj, left_on='object', right_on='module_id', how='inner')
+        log_course_df.drop_duplicates(subset=['enrollment_id', 'event', 'object'], inplace=True)
+        problem_video_df = log_course_df.loc[log_course_df['event'].isin(['problem', 'video'])]
+
+        event_count = problem_video_df.groupby('enrollment_id').event.value_counts().unstack(fill_value=0)
+        event_count.reset_index(inplace=True)
+        problem_video_df = problem_video_df.merge(event_count, on='enrollment_id',how='inner', suffixes=('_total', '_count'))
+        problem_video_df = problem_video_df.filter(items=['enrollment_id', 'problem_total', 'video_total', 'problem_count','video_count']).drop_duplicates()
+        problem_video_df = problem_video_df.assign(problem_ratio = problem_video_df.problem_count/problem_video_df.problem_total).assign(video_ratio = problem_video_df.video_count/problem_video_df.video_total)
+        problem_video_df = problem_video_df.filter(items=['enrollment_id', 'problem_ratio','video_ratio'])
+        problem_video_df = problem_video_df.merge(self.enroll.get_data().filter(['enrollment_id']), on='enrollment_id', how='right')
+        problem_video_df.fillna(0, inplace=True)
+        
+        print("problem_video_ratio features extracted! %f seconds taken" % (time.time()-start_time))
+        print("Shape of the problem_video dataframe: ", problem_video_df.shape)
+
+        return problem_video_df
+
+    def session_count(self):
+        start_time = time.time()
+        enroll_course_df = self.enroll.get_data().merge(self.course_date.get_data(), on='course_id', how='inner')
+        merge_df = self.log.get_data().merge(enroll_course_df, on = 'enrollment_id', how='inner')
+
+        merge_df = merge_df.filter(items=['enrollment_id', 'time', 'event'])
         merge_df = merge_df.assign(time_span = merge_df['time'].values.astype('datetime64[h]') - merge_df['time'].shift(1).values.astype('datetime64[h]'))
         session_series = merge_df.groupby(['enrollment_id']).apply(lambda x: (x['time_span'] != np.timedelta64(0,'ns')).sum())
         session_count_df = session_series.to_frame().reset_index().rename(columns={0:'session_count'})
@@ -47,9 +73,11 @@ class Preprocessor():
 
     def weekly_session_count(self):
         start_time = time.time()
+        enroll_course_df = self.enroll.get_data().merge(self.course_date.get_data(), on='course_id', how='inner')
+        merge_df = self.log.get_data().merge(enroll_course_df, on = 'enrollment_id', how='inner')
 
-        merge_df = self.merge_df.filter(items=['enrollment_id', 'time', 'event', 'start'])
-        merge_df= merge_df.assign(week_index = merge_df['time'].values.astype('datetime64[W]') - merge_df['start'].values.astype('datetime64[W]'))
+        merge_df = merge_df.filter(items=['enrollment_id', 'time', 'event', 'from'])
+        merge_df= merge_df.assign(week_index = merge_df['time'].values.astype('datetime64[W]') - merge_df['from'].values.astype('datetime64[W]'))
         merge_df = merge_df.assign(time_span = merge_df['time'].values.astype('datetime64[h]') - merge_df['time'].shift(1).values.astype('datetime64[h]'))
         weekly_session_count = merge_df.groupby(['enrollment_id', 'week_index']).apply(lambda x: (x['time_span'] != np.timedelta64(0,'ns')).sum())
         weekly_session_count_df = weekly_session_count.to_frame()
@@ -65,9 +93,11 @@ class Preprocessor():
 
     def weekly_event_count(self):
         start_time = time.time()
+        enroll_course_df = self.enroll.get_data().merge(self.course_date.get_data(), on='course_id', how='inner')
+        merge_df = self.log.get_data().merge(enroll_course_df, on = 'enrollment_id', how='inner')
 
-        merge_df = self.merge_df.filter(items=['enrollment_id', 'time', 'event', 'start'])
-        merge_df= merge_df.assign(week_index = merge_df['time'].values.astype('datetime64[W]') - merge_df['start'].values.astype('datetime64[W]'))
+        merge_df = merge_df.filter(items=['enrollment_id', 'time', 'event', 'from'])
+        merge_df= merge_df.assign(week_index = merge_df['time'].values.astype('datetime64[W]') - merge_df['from'].values.astype('datetime64[W]'))
         weekly_event_count = merge_df.groupby(['enrollment_id','week_index']).event.count().unstack(fill_value=0)
         weekly_event_count = weekly_event_count.add_suffix("_count").rename(columns={'0 days 00:00:00_count': 'week_one_event', '7 days 00:00:00_count': 'week_two_event', 
         '14 days 00:00:00_count': 'week_three_event', '21 days 00:00:00_count': 'week_four_event', '28 days 00:00:00_count': 'week_five_event', '35 days 00:00:00_count': 'week_six_event'})
