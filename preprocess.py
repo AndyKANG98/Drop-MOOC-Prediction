@@ -183,8 +183,7 @@ class Preprocessor():
         return X, y
 
     def get_values_partial(self, ratio):
-        features_df = self.data_preprocessing()
-        df_all = features_df.merge(self.truth.get_data(), left_on='enrollment_id', right_on='enrollment_id', how='inner')
+        df_all = self.data_preprocessing()
         df_1 = df_all[(df_all['label']==1)].sample(frac=ratio)
         df_partial = pd.concat([df_1, df_all[(df_all['label']==0)]])
         df_partial_shuffled = df_partial.sample(frac=1)
