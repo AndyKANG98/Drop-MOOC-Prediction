@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np 
+from scipy.special import boxcox1p
 import time
 from datetime import datetime
 from load_data import Course_Date
@@ -130,48 +131,56 @@ class Preprocessor():
 
         return df_all
     
-    def data_preprocessing(self):
+    def train_preprocessing(self):
         start_time = time.time()
 
         df = self.get_features_all()
-        # num_feature = list(df.columns[1:-1])
+'''        num_feature = list(df.columns[1:-1])
 
-        # for item in num_feature:
-        #     Q3 = df[item].quantile(0.75)
-        #     Q1 = df[item].quantile(0.25)
-        #     IQR = Q3-Q1
-        #     upper = Q3+1.5*IQR
-        #     lower = Q1-1.5*IQR
-        #     for i in range (len(df)):
-        #         if df[item][i] < lower:
-        #             df[item][i] = lower
-        #         if df[item][i] > upper:
-        #             df[item][i] = upper
+        for value in num_feature:
+            freq_set = df[value].value_counts()
+            max_1 = freq_set.max()
+            max_2 = 0
+            for num in freq_set:
+                if num == max_1:
+                    continue
+                max_2 = num
+                break
+            ratio = max_2/float(max_1)
+            if ratio < 0.05:
+                df = df.drop(value,1)      
+'''
+        num_feature = list(df.columns[1:-1])
+        for item in num_feature:
+            df[item]= boxcox1p(df[item], 0.25)
 
-        # for value in num_feature:
-        #     freq_set = df[value].value_counts()
-        #     max_1 = freq_set.max()
-        #     max_2 = 0
-        #     for num in freq_set:
-        #         if num == max_1:
-        #             continue
-        #         max_2 = num
-        #         break
-        #     ratio = max_2/float(max_1)
-        #     if ratio < 0.05:
-        #         df = df.drop(value,1)      
-
-        # num_feature = list(df.columns[1:-1])
-        # for item in num_feature:
-        #     df[item]=(df[item]-df[item].min())/(df[item].max()-df[item].min())
-
-        print("Getting data preprocessing done! %f seconds taken" % (time.time()-start_time))
+        print("Getting train data preprocessing done! %f seconds taken" % (time.time()-start_time))
         return df
     
+    def test_preprocessing(self):
+        start_time = time.time()
+
+        df = self.get_features_all()
+        '''num_feature = list(df.columns[1:-1])
+
+      
+        df = df.drop('problem_count',1)
+        df = df.drop('week_six_session',1)
+        df = df.drop('problem_ratio',1)
+'''
+        num_feature = list(df.columns[1:-1])
+        for item in num_feature:
+            df[item]= boxcox1p(df[item], 0.25)
+
+        print("Getting test data preprocessing done! %f seconds taken" % (time.time()-start_time))
+        return df
+    
+    
     def get_values_all(self):
-        # if self.data_type = 'train', do train_preprocessing()
-        # if self.data_type = 'test', do test_preprocessing()
-        df_all = self.data_preprocessing()
+        if self.data_type == 'train':
+            df_all = self.train_preprocessing()
+        if self.data_type == 'test':
+            df_all = self.test_preprocessing()
         
         df_all_shuffled = df_all.sample(frac=1)
         
