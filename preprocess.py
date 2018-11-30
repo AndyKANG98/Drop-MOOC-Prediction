@@ -135,21 +135,7 @@ class Preprocessor():
         start_time = time.time()
 
         df = self.get_features_all()
-'''        num_feature = list(df.columns[1:-1])
 
-        for value in num_feature:
-            freq_set = df[value].value_counts()
-            max_1 = freq_set.max()
-            max_2 = 0
-            for num in freq_set:
-                if num == max_1:
-                    continue
-                max_2 = num
-                break
-            ratio = max_2/float(max_1)
-            if ratio < 0.05:
-                df = df.drop(value,1)      
-'''
         num_feature = list(df.columns[1:-1])
         for item in num_feature:
             df[item]= boxcox1p(df[item], 0.25)
@@ -161,13 +147,7 @@ class Preprocessor():
         start_time = time.time()
 
         df = self.get_features_all()
-        '''num_feature = list(df.columns[1:-1])
 
-      
-        df = df.drop('problem_count',1)
-        df = df.drop('week_six_session',1)
-        df = df.drop('problem_ratio',1)
-'''
         num_feature = list(df.columns[1:-1])
         for item in num_feature:
             df[item]= boxcox1p(df[item], 0.25)
