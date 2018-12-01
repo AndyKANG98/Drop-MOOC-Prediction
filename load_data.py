@@ -47,7 +47,7 @@ class Truth():
         get_labels (dict): get the dictionary of labels information with leys of enrollment_id
     """
     def __init__(self, filename):
-        self.data = pd.read_csv(filename, names=['enrollment_id', 'label'], header=None)
+        self.data = pd.read_csv(filename, names=['enrollment_id', 'label'])
         self.labels = {}
     
         for _, row in self.data.iterrows():
@@ -207,7 +207,4 @@ class Log():
         data = self.data.loc[self.data['enrollment_id'].isin(ids)]
         mask = (data['time'] >= start) & (data['time'] <= end)
         return data.loc[mask]
-
-        
-
-        
+    

@@ -33,6 +33,7 @@ class Preprocessor():
         self.enroll = Enrollment('data/%s/enrollment_%s.csv' % (data_type, data_type))
         self.truth = Truth('data/%s/truth_%s.csv' % (data_type, data_type))
         print("==========%s data loading finished==========" % data_type)
+        print()
 
     def basic_info(self):
         start_time = time.time()
@@ -87,7 +88,8 @@ class Preprocessor():
         weekly_session_count_df = weekly_session_count_df.unstack(fill_value=0).sum(level=1,axis=1)
         weekly_session_count_df = weekly_session_count_df.add_suffix("_count").rename(columns={'0 days 00:00:00_count': 'week_one_session', '7 days 00:00:00_count': 'week_two_session', 
         '14 days 00:00:00_count': 'week_three_session', '21 days 00:00:00_count': 'week_four_session', '28 days 00:00:00_count': 'week_five_session', '35 days 00:00:00_count': 'week_six_session'})
-
+        weekly_session_count_df.reset_index(inplace=True)
+        
         print("Weekly_session_count extracted! Number of features: %i; time: %f seconds" % (weekly_session_count_df.shape[1]-1, (time.time()-start_time)))
 
         return weekly_session_count_df
@@ -126,7 +128,7 @@ class Preprocessor():
         event_session_count_df = pd.merge(event_count_df, session_count_df, how='inner', on='enrollment_id')
         features_df = pd.merge(event_session_count_df, problem_video_df, how='inner', on='enrollment_id')
         
-        df_all = features_df.merge(self.truth.get_data(), left_on='enrollment_id', right_on='enrollment_id', how='inner')
+        df_all = features_df.merge(self.truth.get_data(), on='enrollment_id', how='inner')
         
         print("==========All features extracted==========")
         print("Shape of the features dataframe: ", features_df.shape)
@@ -166,10 +168,11 @@ class Preprocessor():
         
         df_all_shuffled = df_all.sample(frac=1)
         
-        X = df_all_shuffled.drop(columns=['label', 'enrollment_id']).values
+        X = df_all_shuffled.drop(labels=['label', 'enrollment_id'], axis=1).values
         y = df_all_shuffled['label'].values
         
         print("The shape of X: %s; shape of y: %s" % (X.shape, y.shape))
+        print()
         return X, y
 
     def get_values_partial(self, ratio):
@@ -182,11 +185,12 @@ class Preprocessor():
         df_partial = pd.concat([df_1, df_all[(df_all['label']==0)]])
         df_partial_shuffled = df_partial.sample(frac=1)
 
-        X = df_partial_shuffled.drop(columns=['label', 'enrollment_id']).values
+        X = df_partial_shuffled.drop(labels=['label', 'enrollment_id'], axis=1).values
         y = df_partial_shuffled['label'].values
         
         y_ratio = np.count_nonzero(y)/len(y)
         print("The ratio of 1 in labels: ", "{:.2%}".format(y_ratio))
         print("The shape of X: %s; shape of y: %s" % (X.shape, y.shape))
+        print()
         
         return X, y
