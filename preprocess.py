@@ -16,10 +16,10 @@ class Preprocessor():
     Args: 
         data_type (str): 'train' or 'test' to get the corresponding preprocessed feature vectors
     Attributes:
-        event_count (df): Feature - count the numbers of different type of events for each enrollment_id
-        weekly_event_count (df): Feature - divided the user activation period into weeks(7-day), and count the numbers of events
-        weekly_session_count (df): Feature - Numbers of sessions weekly(time_span of two sequential events is less than 1h in each session)
-        problem_video_ratio (df): Feature - calculate the study coverage of problems and videos in the course modules
+        basic_info (df): 1st round feature - number of students per course and number of courses per user
+        event_count (df): 2nd round feature - count the numbers of different type of events for each enrollment_id
+        weekly_session_count (df): 3rd round feature - Numbers of sessions weekly(time_span of two sequential events is less than 1h in each session)
+        problem_video_ratio (df): 4th round feature - calculate the study coverage of problems and videos in the course modules
         get_features_all(df): Feature Selection - Get the dataframe of selected features merged with corerresponding labels
         train_preprocessing (df) & test_preprocessing (df): Feature Transformation - Box-Cox transformation for selected features
         get_values_all (arrays): Get the feature vectors of X and y for prediciton
