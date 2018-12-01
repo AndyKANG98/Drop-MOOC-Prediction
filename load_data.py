@@ -25,8 +25,7 @@ class Course_Date():
             self.course_info[row['course_id']]['date_range'] = date_range
             self.course_info[row['course_id']]['time_span'] = len(date_range)
 
-        print("load course date info over!")
-        print("number of courses:", len(self.course_ids))
+        print("%s loaded! Number of courses:" % filename, len(self.course_ids))
 
     def get_data(self):
         return self.data
@@ -54,8 +53,7 @@ class Truth():
         for _, row in self.data.iterrows():
                 self.labels[row['enrollment_id']] = row['label']
         
-        print("load truth info over!")
-        print("number of labels:", len(self.labels))
+        print("%s loaded! Number of labels:" % filename, len(self.labels))
 
     def get_data(self):
         return self.data
@@ -104,10 +102,7 @@ class Enrollment():
         for key in self.course_info:
             self.course_info[key]['user_number'] = len(self.course_info[key]['username'])
 
-        print("load enrollment info over!")
-        print("number of courses:", len(self.course_info))
-        print("number of enrollments:", len(self.enrollment_info))
-        print("number of uers: ", len(self.user_info))
+        print("%s loaded! Number of enrollments:" % filename, len(self.enrollment_info))
 
     def get_data(self):
         return self.data
@@ -138,7 +133,7 @@ class Course_Object():
         get_course_info_count (dict): get the dictionary of courses information with number of modules each course contains
     """
     def __init__(self, filename):
-        self.data = pd.read_csv(filename).drop_duplicates()
+        self.data = pd.read_csv(filename).drop_duplicates(subset='module_id', keep='first')
         self.module_ids = []
         self.course_info = {}
         self.module_info = {}
@@ -159,9 +154,7 @@ class Course_Object():
         for key in self.course_info:
             self.course_info_count[key] = {'module_number': len(self.course_info[key])}
 
-        print("load course object info over!")
-        print("number of courses:", len(self.course_info))
-        print("number of moduels:", len(self.module_info))
+        print("%s loaded! Number of moduels:" % filename, len(self.module_info))
 
     def get_data(self):
         return self.data
@@ -195,9 +188,7 @@ class Log():
         self.data['time'] = pd.to_datetime(self.data['time'])
         self.enrollment_ids = self.data['enrollment_id'].unique()
 
-        print("load course object info over!")
-        print("size of log data:", len(self.data['enrollment_id']))
-        print("number of enrollment_ids:", len(self.enrollment_ids))
+        print("%s loaded! Size of log data:" % filename, len(self.data['enrollment_id']))
     
     def get_data(self):
         return self.data
