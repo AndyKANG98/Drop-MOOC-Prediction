@@ -176,16 +176,17 @@ class Preprocessor():
         return X, y
 
     def get_values_partial(self, ratio):
-        if self.data_type == 'train':
-            df_all = self.train_preprocessing()
-        if self.data_type == 'test':
-            df_all = self.test_preprocessing()
+        df_all = self.get_features_all()
 
         df_1 = df_all[(df_all['label']==1)].sample(frac=ratio)
         df_partial = pd.concat([df_1, df_all[(df_all['label']==0)]])
         df_partial_shuffled = df_partial.sample(frac=1)
+        
+        # num_feature = list(df_partial_shuffled.columns[1:-1])
+        # for item in num_feature:
+        #     df_partial_shuffled[item]= boxcox1p(df_partial_shuffled[item], 0.25)
 
-        X = df_partial_shuffled.drop(labels=['label', 'enrollment_id'], axis=1).values
+        X = df_partial_shuffled.drop(labels=['label', 'enrollment_id', 'problem_ratio','video_ratio'], axis=1).values
         y = df_partial_shuffled['label'].values
         
         y_ratio = np.count_nonzero(y)/len(y)
