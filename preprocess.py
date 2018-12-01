@@ -181,10 +181,6 @@ class Preprocessor():
         df_1 = df_all[(df_all['label']==1)].sample(frac=ratio)
         df_partial = pd.concat([df_1, df_all[(df_all['label']==0)]])
         df_partial_shuffled = df_partial.sample(frac=1)
-        
-        # num_feature = list(df_partial_shuffled.columns[1:-1])
-        # for item in num_feature:
-        #     df_partial_shuffled[item]= boxcox1p(df_partial_shuffled[item], 0.25)
 
         X = df_partial_shuffled.drop(labels=['label', 'enrollment_id', 'problem_ratio','video_ratio'], axis=1).values
         y = df_partial_shuffled['label'].values
