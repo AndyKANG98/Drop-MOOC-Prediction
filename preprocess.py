@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np 
-from scipy.special import boxcox1p
 import time
+from scipy.special import boxcox1p
 from datetime import datetime
 from load_data import Course_Date
 from load_data import Course_Object

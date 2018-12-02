@@ -154,7 +154,7 @@ class Course_Object():
         for key in self.course_info:
             self.course_info_count[key] = {'module_number': len(self.course_info[key])}
 
-        print('%s loaded! Number of moduels: %i' % (filename, len(self.module_info)))
+        print('%s loaded! Number of modules: %i' % (filename, len(self.module_info)))
 
     def get_data(self):
         return self.data
