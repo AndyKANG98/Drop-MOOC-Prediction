@@ -81,6 +81,7 @@ def main():
     X_train, y_train = p_train.get_values_all()
     X_test, y_test = p_test.get_values_all()
     
+    print ('==========Classification==========')
     # Random forest
     random_forest(X_train, y_train, X_test, y_test)
     
@@ -90,6 +91,7 @@ def main():
     # XGboost
     XGboost(X_train, y_train, X_test, y_test)
     
+    print ('==========Voting==========')
     # Voting
     voting(X_train, y_train, X_test, y_test)
 
