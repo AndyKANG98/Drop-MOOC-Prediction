@@ -32,8 +32,8 @@ class Preprocessor():
         self.log = Log('data/%s/log_%s.csv' % (data_type, data_type))
         self.enroll = Enrollment('data/%s/enrollment_%s.csv' % (data_type, data_type))
         self.truth = Truth('data/%s/truth_%s.csv' % (data_type, data_type))
-        print("==========%s data loading finished==========" % data_type)
-        print()
+        print('==========%s data loading finished==========' % data_type)
+        print('')
 
     def basic_info(self):
         start_time = time.time()
@@ -131,7 +131,7 @@ class Preprocessor():
         df_all = features_df.merge(self.truth.get_data(), on='enrollment_id', how='inner')
         
         print("==========All features extracted==========")
-        print("Shape of the features dataframe: ", features_df.shape)
+        print('Shape of the features dataframe: ', features_df.shape)
 
         return df_all
     
@@ -172,7 +172,7 @@ class Preprocessor():
         y = df_all_shuffled['label'].values
         
         print("The shape of X: %s; shape of y: %s" % (X.shape, y.shape))
-        print()
+        print('')
         return X, y
 
     def get_values_partial(self, ratio):
@@ -188,6 +188,6 @@ class Preprocessor():
         y_ratio = np.count_nonzero(y)/len(y)
         print("The ratio of 1 in labels: ", "{:.2%}".format(y_ratio))
         print("The shape of X: %s; shape of y: %s" % (X.shape, y.shape))
-        print()
+        print('')
         
         return X, y

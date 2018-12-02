@@ -22,7 +22,7 @@ def random_forest(X_train, y_train, X_test, y_test):
     print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
     print ("Testing Score:")
     print (clf.score(X_test,y_test))
-    print ()
+    print ('')
     
 def logistic_regression(X_train, y_train, X_test, y_test):
     
@@ -36,7 +36,7 @@ def logistic_regression(X_train, y_train, X_test, y_test):
     print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
     print ("Testing Score:")
     print (clf.score(X_test,y_test))
-    print ()
+    print ('')
     
 def XGboost(X_train, y_train, X_test, y_test):
 
@@ -51,7 +51,7 @@ def XGboost(X_train, y_train, X_test, y_test):
     print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
     print ("Testing Score:")
     print (clf.score(X_test,y_test))
-    print ()
+    print ('')
     
 def voting(X_train, y_train, X_test, y_test):
     

@@ -7,3 +7,4 @@ data/*.ipynb
 **/.DS_Store
 __pycache__
 *.pyc
+Load_data_guide.ipynb
