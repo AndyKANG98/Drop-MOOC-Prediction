@@ -130,8 +130,8 @@ class Preprocessor():
         
         df_all = features_df.merge(self.truth.get_data(), on='enrollment_id', how='inner')
         
-        print("==========All features extracted==========")
-        print('Shape of the features dataframe: ', features_df.shape)
+        print('==========All features extracted==========')
+        print("Shape of the features dataframe: %s" % (features_df.shape,))
 
         return df_all
     

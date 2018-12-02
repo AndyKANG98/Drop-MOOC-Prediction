@@ -17,16 +17,12 @@ def random_forest(X_train, y_train, X_test, y_test):
     clf = clf.fit(X_train, y_train)
     expected = y_test
     predicted = clf.predict(X_test)
-    t1 = time.time()
 
-    print("Classification report for classifier %s:\n%s\n"
-          % (clf, metrics.classification_report(expected, predicted)))
-    print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
-    print ("Testing Score:")
-    print (clf.score(X_test,y_test))
-    print ('Time')
-    print (t1-t0)
-    print ('')
+    print ('Classifier: %s\n' % (clf,))
+    print ('Classification report: \n %s \n' % (metrics.classification_report(expected, predicted),))
+    print ('Confusion matrix:\n%s\n' % metrics.confusion_matrix(expected, predicted))
+    print ('Testing Score: %f' % clf.score(X_test,y_test))
+    print ('Time: %f seconds \n' % (time.time()-t0))
     
 def logistic_regression(X_train, y_train, X_test, y_test):
         
@@ -36,14 +32,11 @@ def logistic_regression(X_train, y_train, X_test, y_test):
     expected = y_test
     predicted = clf.predict(X_test)
 
-    print("Classification report for classifier %s:\n%s\n"
-          % (clf, metrics.classification_report(expected, predicted)))
-    print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
-    print ("Testing Score:")
-    print (clf.score(X_test,y_test))
-    print ('Time')
-    print (t1-t0)
-    print ('')
+    print ('Classifier: %s\n' % (clf,))
+    print ('Classification report: \n %s \n' % (metrics.classification_report(expected, predicted),))
+    print ('Confusion matrix:\n%s\n' % metrics.confusion_matrix(expected, predicted))
+    print ('Testing Score: %f' % clf.score(X_test,y_test))
+    print ('Time: %f seconds \n' % (time.time()-t0))
     
 def XGboost(X_train, y_train, X_test, y_test):
 
@@ -54,14 +47,11 @@ def XGboost(X_train, y_train, X_test, y_test):
     expected = y_test
     predicted = clf.predict(X_test)
 
-    print("Classification report for classifier %s:\n%s\n"
-          % (clf, metrics.classification_report(expected, predicted)))
-    print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
-    print ("Testing Score:")
-    print (clf.score(X_test,y_test))
-    print ('Time')
-    print (t1-t0)
-    print ('')
+    print ('Classifier: %s\n' % (clf,))
+    print ('Classification report: \n %s \n' % (metrics.classification_report(expected, predicted),))
+    print ('Confusion matrix:\n%s\n' % metrics.confusion_matrix(expected, predicted))
+    print ('Testing Score: %f' % clf.score(X_test,y_test))
+    print ('Time: %f seconds \n' % (time.time()-t0))
     
 def voting(X_train, y_train, X_test, y_test):
     
@@ -76,13 +66,11 @@ def voting(X_train, y_train, X_test, y_test):
     expected = y_test
     predicted = clf.predict(X_test)
 
-    print("Classification report for classifier %s:\n%s\n"
-          % (clf, metrics.classification_report(expected, predicted)))
-    print("Confusion matrix:\n%s" % metrics.confusion_matrix(expected, predicted))
-    print ("Testing Score:")
-    print (clf.score(X_test,y_test))
-    print ('Time')
-    print (t1-t0)
+    print ('Classifier: %s\n' % (clf,))
+    print ('Classification report: \n %s \n' % (metrics.classification_report(expected, predicted),))
+    print ('Confusion matrix:\n%s\n' % metrics.confusion_matrix(expected, predicted))
+    print ('Testing Score: %f' % clf.score(X_test,y_test))
+    print ('Time: %f seconds \n' % (time.time()-t0))
     
 def main():
     
