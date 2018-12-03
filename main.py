@@ -11,7 +11,7 @@ from sklearn import metrics
 from xgboost import XGBClassifier
 
 def random_forest(X_train, y_train, X_test, y_test):
-    """Predict Dropouts using Raondom Forest Classifier
+    """Predict Dropouts using Random Forest Classifier
 
     Args: 
         X_train: Training feature vetors

@@ -3,11 +3,11 @@ import numpy as np
 import time
 from scipy.special import boxcox1p
 from datetime import datetime
-from load_data import Course_Date
-from load_data import Course_Object
-from load_data import Log
-from load_data import Enrollment
-from load_data import Truth
+from read_data import Course_Date
+from read_data import Course_Object
+from read_data import Log
+from read_data import Enrollment
+from read_data import Truth
 
 
 class Preprocessor():

@@ -3,6 +3,7 @@ data/train
 data/*.csv
 data/*.ipynb
 .ipynb_checkpoints
+Ideas/
 
 **/.DS_Store
 __pycache__
