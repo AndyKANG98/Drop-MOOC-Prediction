@@ -28,19 +28,19 @@
 ## Overview
 
 ```
-|-- read_data.py			# Read Data from data/
-|-- preprocess.py			# Feature Extraction and data processing
-|-- main.py				# Biuld Classifiers to make prediction
+|-- read_data.py			# Read data from data/
+|-- preprocess.py			# Feature extraction and data processing
+|-- main.py				# Biuld classifiers to make prediction
 |-- demo.ipynb
 |-- data
 |   |-- DataDescription.txt		# Data discription
 |   |-- date.csv
 |   |-- object.csv
-|   |-- train				# training data
+|   |-- train				# Training data
 |   |   |-- enrollment_train.csv
 |   |   |-- log_train.csv
 |   |   |-- truth_train.csv
-|   |-- object.csv			# testing data
+|   |-- object.csv			# Testing data
 |   |   |-- enrollment_test.csv
 |   |   |-- log_test.csv
 |   |   |-- truth_test.csv
