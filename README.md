@@ -30,17 +30,17 @@
 ```
 |-- read_data.py			# Read Data from data/
 |-- preprocess.py			# Feature Extraction and data processing
-|-- main.py					# Biuld Classifiers to make prediction
+|-- main.py				# Biuld Classifiers to make prediction
 |-- demo.ipynb
 |-- data
-|   |-- DataDescription.txt			# Data discription
+|   |-- DataDescription.txt		# Data discription
 |   |-- date.csv
 |   |-- object.csv
-|   |-- train						# training data
+|   |-- train				# training data
 |   |   |-- enrollment_train.csv
 |   |   |-- log_train.csv
 |   |   |-- truth_train.csv
-|   |-- object.csv					# testing data
+|   |-- object.csv			# testing data
 |   |   |-- enrollment_test.csv
 |   |   |-- log_test.csv
 |   |   |-- truth_test.csv
@@ -134,7 +134,7 @@ The changing of cross-validation score in each round is shown in the plotting im
 
     After the transformation, we can see that the distribution of features became less skewed which was positive to the prediction. 
     
-	<img src="pictures/transformation.png"/>
+	<div align=center><img src="pictures/transformation.png"/>
 	
 	> Right - after transformation; Left - before transformation
 
@@ -144,7 +144,7 @@ The changing of cross-validation score in each round is shown in the plotting im
 ### Model-Selection
 After finalizing three sets of features and conducting data discretization and transformation, the next step is to find 3 most suitable methods for voting. We tried 5 different methods to run the data and select 3 out of them based on both running time and 5-fold cross-validation score. 
 
-![](pictures/model_selection.png)
+<img src="pictures/model_selection.png"/>
 
 
 | **Classifiers**         | **5-fold cross validation average** | **Time** | **Key parameters**             |
