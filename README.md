@@ -6,9 +6,24 @@
 
 <br>
 
-[TOC]
+* [Overview](#Overview)
+* [About Data](#About-Data)
+* [Feature Engineering](#Feature-Engineering)
+* [Data Preprocessing](#Data-Preprocessing)
+* [Classification](#Classification)
+    * [Model Selection](#Model-Selection)
+    - [Parameters Optimization](#Parameters-Optimization)
+    - [Improved Gradient Boosting - XGBoost](#Improved-Gradient-Boosting-XGBoost)
+    - [Classifier Voting](#Classifier-Voting)
+- [Results](#Results)
+- [Evaluation](#Evaluation)
+    - [Imbalance Data](#Imbalance-Data)
+    - [Ablation Analysis](#Ablation-Analysis)
+- [Appendix](#Appendix)
+    - [References](#References)
+    - [Team info & Work distribution](#Teamwork)
 
-
+<br>
 
 ## Overview
 
@@ -52,7 +67,7 @@ python main.py
 ```
 <br>
 
-## About Data
+## About-Data
 
 * The data sets are sourced from KDD Cup 2015, contains course date, course object, enrollment, event log, and truth label information. Value of most information is encrypted and has no literal meaning. Overall, the dataset can be divided into 4 parts:
   * Course information (date.csv & object.csv)
@@ -74,7 +89,7 @@ python main.py
 
 <br>
 
-## Feature Engineering
+## Feature-Engineering
 After loading the data, we implemented 4 rounds of feature selection to get used of the information of the event log, time intervals, modules info, etc. We dived deep into the logic of the feature engineering each round and improve the cross-validation score of our models continuously.
 
 * **Round 1: Basic user information**
@@ -100,11 +115,11 @@ The changing of cross-validation score in each round is shown in the plotting im
 * **weekly_session_count** (df): 3rd round feature - Numbers of sessions weekly(time_span of two sequential events is less than 1h in each session)
 * **problem_video_ratio** (df): 4th round feature - calculate the study coverage of problems and videos in the course modules
 
-![](pictures/features.png)
+	<div align=center><img src="pictures/features.png" width="70%" height="70%">
 
 <br>
 
-## Data Preprocessing
+## Data-Preprocessing
 
 * Discretization
   * In the above feature engineering process, we’d already implemented data discretization by discretizing the time series data to counting values. Cutting time series into time intervals and values counting help us to implement this.
@@ -118,16 +133,19 @@ The changing of cross-validation score in each round is shown in the plotting im
     	<div align=center><img src="pictures/formula.png">
 
     After the transformation, we can see that the distribution of features became less skewed which was positive to the prediction. 
-    ![](pictures/transformation.png)
-
-    > Right - after transformation					Left - before transformation
+    
+	<img src="pictures/transformation.png"/>
+	
+	> Right - after transformation; Left - before transformation
 
 <br>
 
 ## Classification
-### Model Selection
+### Model-Selection
 After finalizing three sets of features and conducting data discretization and transformation, the next step is to find 3 most suitable methods for voting. We tried 5 different methods to run the data and select 3 out of them based on both running time and 5-fold cross-validation score. 
+
 ![](pictures/model_selection.png)
+
 
 | **Classifiers**         | **5-fold cross validation average** | **Time** | **Key parameters**             |
 | -------------------------   | ----------------------------------- | -------- | -------------------------- |
@@ -143,7 +161,7 @@ We select Random Forest, Logistic Regression and Gradient Boosting since they pe
 
 <br>
 
-### Parameters optimization
+### Parameters-Optimization
 
 | **Classifier** |**Parameter candidates** |**Parameter settings** |**Optimal cross-validation   score** |
 | -------------- | ------------------------ | ---------------------- | ------------------------------------ |
@@ -168,7 +186,7 @@ max_depth: maximum depth of the individual regression estimators. The maximum de
 
 <br>
 
-### Improved Gradient Boosting -  XGBoost
+### Improved-Gradient-Boosting-XGBoost
 During our research, we notice that besides the Gradient Boosting available in scikit-learn, another boosting method called XGBoost (Extreme Gradient Boosting) may provide better results. Generally speaking, XGBoost is faster than Gradient Boosting but the latter could be used in more applications. Specifically, XGBoost adds a few tricks based on Gradient Boosting:
 
 * Clever penalization of trees by the proportional shrinking of leaf nodes
@@ -184,7 +202,7 @@ As we could see here, XGBoosting can provide better score with high efficiency b
 
 <br>
 
-### Classifier Voting
+### Classifier-Voting
 In order to fully extract the advantages of the 3 methods, we conduct a voting method to ensemble the results generated. The logic of voting here is rather straightforward: it uses majority rule voting, meaning that our final prediction will be “drop” if and only if there are 2 or 3 classifiers predicting “drop”. 
 
 Here is a comparison of 5-fold cross validation score among three methods and the voting method:
@@ -245,7 +263,7 @@ Time: 14.453723 seconds
 <br>
 
 ## Evaluation
-### Imbalance data
+### Imbalance-Data
 As we mentioned in loading the data, the labels are unbalanced with dropout labels (79%) against non-dropouts (21%). We tried random undersampling methods to reduce the number of training data with label “1”. We undersampled 50% of “1” and made the ratio of “1” in labels 65.62%. However, the random undersampling didn’t give a better performance. It resulted in a higher recall but lower precision for “0”, which means a larger probability to predict an enrollment_id as “0”.
 ```
 Classification report: 
@@ -262,7 +280,7 @@ However, the undersampling gives us a deeper understanding of the data distribut
 
 <br>
 
-### Ablation Analysis
+### Ablation-Analysis
 
 The table below summarizes the results of the ablation study conducted for each classifier by **removing each class of features**.
 
@@ -369,7 +387,7 @@ It is obvious that week_five_session is the most effective feature among all the
 
 <br>
 
-### Team info & Work distribution
+### Teamwork
 
 | **Name**     | **Work**                                             |
 | ------------ | ---------------------------------------------------- |
