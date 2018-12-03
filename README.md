@@ -132,7 +132,7 @@ The changing of cross-validation score in each round is shown in the plotting im
 
     	<div align=center><img src="pictures/formula.png">
 
-    After the transformation, we can see that the distribution of features became less skewed which was positive to the prediction. 
+    * After the transformation, we can see that the distribution of features became less skewed which was positive to the prediction. 
     
 	<div align=center><img src="pictures/transformation.png"/>
 	
@@ -146,6 +146,7 @@ After finalizing three sets of features and conducting data discretization and t
 
 <img src="pictures/model_selection.png"/>
 
+<br>
 
 | **Classifiers**         | **5-fold cross validation average** | **Time** | **Key parameters**             |
 | -------------------------   | ----------------------------------- | -------- | -------------------------- |
@@ -156,6 +157,8 @@ After finalizing three sets of features and conducting data discretization and t
 | Gradient Boosting   | 87.517%                             | 5.93     | (default parameters)   |
 
 > SVM is not shown in the chart because it takes a too long time, yet its performance is still lowest among all methods.
+
+<br>
 
 We select Random Forest, Logistic Regression and Gradient Boosting since they perform better in both scoring and efficiency. 
 
@@ -171,18 +174,18 @@ We select Random Forest, Logistic Regression and Gradient Boosting since they pe
 
 We tunned the parameters of the above classifiers using cross-validation scores.
 * Random Forest
-n_estimators: The number of trees in the forest. Increasing the value will raise the accuracy, but cost more time.
-max_depth: The maximum depth of the tree. It turns out having proper limitations of the max_deplth can help improve the performance.
-min_samples: The minimum number of samples required to split an internal node. Increasing the number will let the classifier rougher, and reduce overfitting. 
+  * n_estimators: The number of trees in the forest. Increasing the value will raise the accuracy, but cost more time.
+  * max_depth: The maximum depth of the tree. It turns out having proper limitations of the max_deplth can help improve the performance.
+  * min_samples: The minimum number of samples required to split an internal node. Increasing the number will let the classifier rougher, and reduce overfitting. 
 
 * Logistic Regression
-tol: Tolerance for stopping criteria. It turns out there’s no much difference when tolerance decreasing. So we set the smallest one to accelerate the model.
-C: Inverse of regularization strength. Like in support vector machines, smaller values specify stronger regularization. It turns out a slightly larger C gives a better result.
+  * tol: Tolerance for stopping criteria. It turns out there’s no much difference when tolerance decreasing. So we set the smallest one to accelerate the model.
+  * C: Inverse of regularization strength. Like in support vector machines, smaller values specify stronger regularization. It turns out a slightly larger C gives a better result.
 
 * Gradient Boosting
-n_estimators: The number of boosting stages to perform. Gradient boosting is fairly robust to overfitting so a large number usually results in better performance.
-learning_rate: learning rate shrinks the contribution of each tree by learning_rate. There is a trade-off between learning_rate and n_estimators.
-max_depth: maximum depth of the individual regression estimators. The maximum depth limits the number of nodes in the tree.
+  * n_estimators: The number of boosting stages to perform. Gradient boosting is fairly robust to overfitting so a large number usually results in better performance.
+  * learning_rate: learning rate shrinks the contribution of each tree by learning_rate. There is a trade-off between learning_rate and n_estimators.
+  * max_depth: maximum depth of the individual regression estimators. The maximum depth limits the number of nodes in the tree.
 
 <br>
 
