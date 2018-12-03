@@ -85,14 +85,14 @@ python main.py
   * Labels (truth_train/test.csv)
     * This is the truth labels for each enrollment id, shows whether a user drop the certain course (1=dropout, 0=keep enrolled)
 
-      > Labels: <enrollment_id, label
+      > Labels: <enrollment_id, label>
 
 <br>
 
 ## Feature-Engineering
 After loading the data, we implemented 4 rounds of feature selection to get used of the information of the event log, time intervals, modules info, etc. We dived deep into the logic of the feature engineering each round and improve the cross-validation score of our models continuously.
 
-* **Round 1: Basic user information**
+* **Round 1: Basic User Information**
 
   * The initial idea was to get some basic user profile data. However, there’s no direct user information provided. So, inspired by the potential relationship between the courses and users, we counted the courses per user enrolled and students per course using Enrollment() data.
 * **Round 2: Event Activities**
@@ -144,7 +144,7 @@ The changing of cross-validation score in each round is shown in the plotting im
 ### Model-Selection
 After finalizing three sets of features and conducting data discretization and transformation, the next step is to find 3 most suitable methods for voting. We tried 5 different methods to run the data and select 3 out of them based on both running time and 5-fold cross-validation score. 
 
-<img src="pictures/model_selection.png"/>
+> <div align=center><img src="pictures/model_selection.png">
 
 <br>
 
